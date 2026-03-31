@@ -25,10 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
         'time_printer = super_NikonSlastin_study_pkg.scripts.time_printer:main',
-        'talker = super_NikonSlastin_study_pkg.talker:main',
-        'listener = super_NikonSlastin_study_pkg.listener:main',
-        'even_pub = super_NikonSlastin_study_pkg.even_number_publisher:main',
-        'overflow_listener = super_NikonSlastin_study_pkg.overflow_listener:main',
+        'even_number_publisher = super_NikonSlastin_study_pkg.scripts.even_number_publisher:main',
+        'overflow_listener = super_NikonSlastin_study_pkg.scripts.overflow_listener:main',
         ],
     },
 )
