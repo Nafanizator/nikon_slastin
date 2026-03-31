@@ -1,9 +1,7 @@
 from setuptools import setup
 import os
 from glob import glob
-
 package_name = 'super_NikonSlastin_study_pkg'
-
 setup(
     name=package_name,
     version='0.0.0',
@@ -14,14 +12,13 @@ setup(
         ('share/' + package_name, ['package.xml']),
         # Добавляем поддержку launch-файлов
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        # Добавляем поддержку параметров
         (os.path.join('share', package_name, 'params'), glob('params/*.yaml')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='Nikon Slastin',
-    maintainer_email='your_email@example.com',
-    description='ROS2 package with even number publisher and overflow listener',
+    maintainer_email='nikon.slastin@example.com',
+    description='ROS2 package with even number publisher, listener, and launch files',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
