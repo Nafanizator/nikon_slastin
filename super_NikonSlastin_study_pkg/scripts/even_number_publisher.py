@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Узел-публикатор чётных чисел с детектором переполнения"""
+"""Узел-публикатор чётных чисел с поддержкой параметров"""
 
 import rclpy
 from rclpy.node import Node
@@ -9,29 +9,41 @@ class EvenNumberPublisher(Node):
     def __init__(self):
         super().__init__('even_pub')
         
-        # Публикатор в основной топик
-        self.publisher = self.create_publisher(Int32, '/even_numbers', 10)
+        # Объявляем параметры с значениями по умолчанию
+        self.declare_parameter('publish_frequency', 10.0)   # частота в Гц
+        self.declare_parameter('overflow_threshold', 100)   # порог переполнения
+        self.declare_parameter('topic_name', '/even_numbers') # имя топика
         
-        # Публикатор в топик переполнения
+        # Читаем параметры
+        self.freq = self.get_parameter('publish_frequency').value
+        self.threshold = self.get_parameter('overflow_threshold').value
+        self.topic = self.get_parameter('topic_name').value
+        
+        # Создаём публикаторы
+        self.publisher = self.create_publisher(Int32, self.topic, 10)
         self.overflow_publisher = self.create_publisher(Int32, '/overflow', 10)
         
-        # Таймер на 10 Гц
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        # Создаём таймер с рассчитанным периодом
+        period = 1.0 / self.freq
+        self.timer = self.create_timer(period, self.timer_callback)
         
         # Счётчик
         self.counter = 0
         
-        self.get_logger().info("Узел even_pub запущен! Публикую чётные числа")
+        self.get_logger().info(f"Узел even_pub запущен с параметрами:")
+        self.get_logger().info(f"  - частота: {self.freq} Гц")
+        self.get_logger().info(f"  - порог: {self.threshold}")
+        self.get_logger().info(f"  - топик: {self.topic}")
 
     def timer_callback(self):
         # Создаём основное сообщение
         msg = Int32()
         msg.data = self.counter
         self.publisher.publish(msg)
-        self.get_logger().info(f"Публикую: {self.counter}")
+        self.get_logger().info(f"Публикую в {self.topic}: {self.counter}")
         
         # Проверяем на переполнение
-        if self.counter >= 100:
+        if self.counter >= self.threshold:
             # Публикуем сообщение о переполнении
             overflow_msg = Int32()
             overflow_msg.data = self.counter

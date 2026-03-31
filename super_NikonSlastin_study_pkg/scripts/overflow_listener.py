@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Узел-слушатель сообщений о переполнении"""
+"""Узел-слушатель сообщений о переполнении с поддержкой параметров"""
 
 import rclpy
 from rclpy.node import Node
@@ -9,18 +9,26 @@ class OverflowListener(Node):
     def __init__(self):
         super().__init__('overflow_listener')
         
-        # Подписываемся на топик /overflow
+        # Объявляем параметры
+        self.declare_parameter('overflow_topic', '/overflow')
+        self.declare_parameter('enable_logging', True)
+        
+        # Читаем параметры
+        self.topic = self.get_parameter('overflow_topic').value
+        self.enable_logging = self.get_parameter('enable_logging').value
+        
+        # Подписываемся на топик
         self.subscription = self.create_subscription(
             Int32,
-            '/overflow',
+            self.topic,
             self.callback,
             10
         )
         
-        self.get_logger().info("Узел overflow_listener запущен! Слушаю топик /overflow")
+        self.get_logger().info(f"Узел overflow_listener запущен!")
+        self.get_logger().info(f"  Слушаю топик: {self.topic}")
 
     def callback(self, msg):
-        # Выводим предупреждение при получении сообщения
         self.get_logger().warn(f"!!! ПЕРЕПОЛНЕНИЕ !!! Получено значение: {msg.data}")
 
 def main(args=None):
@@ -37,3 +45,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
